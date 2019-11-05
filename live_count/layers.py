@@ -6,7 +6,7 @@ Tel Aviv University
 import numpy
 import theano
 import theano.tensor as T
-from theano.tensor.signal import downsample
+from theano.tensor.signal import pool
 from theano.tensor.nnet import conv
 
 
@@ -135,12 +135,16 @@ class LeNetConvPoolLayer(object):
         self.b = theano.shared(value=b_values, borrow=True)
 
         # convolve input feature maps with filters
+        print("###### image_shape ######")
+        print(image_shape)
+        for i in range(0,3):
+            print(str(image_shape[i]))
         conv_out = conv.conv2d(input=input, filters=self.W,
                 filter_shape=filter_shape, image_shape=image_shape)
 
         # downsample each feature map individually, using maxpooling
-        pooled_out = downsample.max_pool_2d(input=conv_out,
-                                            ds=poolsize, ignore_border=True)
+        pooled_out = pool.pool_2d(input=conv_out,
+                                            ws=poolsize, ignore_border=True)
 
         self.output = T.maximum(0.0, pooled_out + self.b.dimshuffle('x', 0, 'x', 'x'))
                 
